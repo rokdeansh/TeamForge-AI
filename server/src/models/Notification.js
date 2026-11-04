@@ -1,0 +1,4 @@
+﻿import mongoose from 'mongoose';
+const schema = new mongoose.Schema({ recipient: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true }, workspace: { type: mongoose.Schema.Types.ObjectId, ref: 'Workspace', required: true }, actor: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true }, type: { type: String, enum: ['task_assigned', 'task_status_changed', 'project_updated', 'workspace_joined'], required: true }, entityType: { type: String, enum: ['task', 'project', 'workspace'], required: true }, entity: { type: mongoose.Schema.Types.ObjectId, required: true }, read: { type: Boolean, default: false } }, { timestamps: true });
+schema.index({ recipient: 1, read: 1, createdAt: -1 });
+export const Notification = mongoose.models.Notification || mongoose.model('Notification', schema);

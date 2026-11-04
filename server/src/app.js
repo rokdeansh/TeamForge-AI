@@ -1,0 +1,23 @@
+﻿import express from 'express';
+import helmet from 'helmet';
+import cors from 'cors';
+import compression from 'compression';
+import morgan from 'morgan';
+import cookieParser from 'cookie-parser';
+import { env } from './config/env.js';
+import apiRoutes from './routes/index.js';
+import { notFound, errorHandler } from './middleware/errorHandler.js';
+import { verifyRequestOrigin } from './middleware/csrf.js';
+
+export const app = express();
+app.disable('x-powered-by');
+app.use(helmet());
+app.use(cors({ origin: env.CLIENT_ORIGIN, credentials: true, methods: ['GET', 'POST', 'PATCH', 'PUT', 'DELETE', 'OPTIONS'] }));
+app.use(compression());
+app.use(express.json({ limit: '100kb' }));
+app.use(cookieParser());
+app.use(morgan(env.NODE_ENV === 'production' ? 'combined' : 'dev'));
+app.use(verifyRequestOrigin);
+app.use('/api/v1', apiRoutes);
+app.use(notFound);
+app.use(errorHandler);

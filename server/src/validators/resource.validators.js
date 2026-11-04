@@ -1,0 +1,17 @@
+﻿import { z } from 'zod';
+const objectId = z.string().regex(/^[a-f\d]{24}$/i);
+const workspaceId = z.object({ workspaceId: objectId });
+const taskStatus = z.enum(['To Do', 'In Progress', 'In Review', 'Completed']);
+const priority = z.enum(['Low', 'Medium', 'High']);
+const projectStatus = z.enum(['Planning', 'In Progress', 'On Hold', 'Completed']);
+export const workspaceCreateSchema = z.object({ body: z.object({ name: z.string().trim().min(2).max(100), description: z.string().max(1000).optional() }).strict() });
+export const workspaceUpdateSchema = z.object({ body: z.object({ name: z.string().trim().min(2).max(100).optional(), description: z.string().max(1000).optional() }).strict().refine(v => Object.keys(v).length > 0) });
+export const projectCreateSchema = z.object({ body: workspaceId.extend({ name: z.string().trim().min(2).max(140), description: z.string().max(4000).optional(), deadline: z.string().datetime().optional() }).strict() });
+export const projectUpdateSchema = z.object({ body: z.object({ name: z.string().trim().min(2).max(140).optional(), description: z.string().max(4000).optional(), status: projectStatus.optional(), deadline: z.string().datetime().nullable().optional() }).strict().refine(v => Object.keys(v).length > 0) });
+export const taskCreateSchema = z.object({ body: workspaceId.extend({ projectId: objectId, title: z.string().trim().min(2).max(200), description: z.string().max(5000).optional(), assignees: z.array(objectId).max(100).optional(), priority: priority.optional(), status: taskStatus.optional(), dueDate: z.string().datetime().optional(), order: z.number().finite().optional() }).strict() });
+export const taskBulkCreateSchema = z.object({ body: workspaceId.extend({ projectId: objectId, tasks: z.array(z.object({ title: z.string().trim().min(2).max(200), description: z.string().max(5000).optional(), priority: priority.optional() }).strict()).min(1).max(100) }).strict() });
+export const taskUpdateSchema = z.object({ body: z.object({ title: z.string().trim().min(2).max(200).optional(), description: z.string().max(5000).optional(), assignees: z.array(objectId).max(100).optional(), priority: priority.optional(), status: taskStatus.optional(), dueDate: z.string().datetime().nullable().optional(), order: z.number().finite().optional() }).strict().refine(v => Object.keys(v).length > 0) });
+export const noteCreateSchema = z.object({ body: workspaceId.extend({ projectId: objectId.nullable().optional(), title: z.string().trim().min(1).max(200), content: z.string().max(30000).optional() }).strict() });
+export const noteUpdateSchema = z.object({ body: z.object({ title: z.string().trim().min(1).max(200).optional(), content: z.string().max(30000).optional() }).strict().refine(v => Object.keys(v).length > 0) });
+export const invitationSchema = z.object({ body: z.object({ role: z.enum(['admin', 'member']).optional(), expiresInDays: z.number().int().min(1).max(30).optional(), maxUses: z.number().int().min(1).max(50).optional() }).strict() });
+export const acceptInvitationSchema = z.object({ body: z.object({ token: z.string().min(30).max(200) }).strict() });

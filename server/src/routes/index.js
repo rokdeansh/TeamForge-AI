@@ -1,0 +1,27 @@
+﻿import { Router } from 'express';
+import authRoutes from './auth.routes.js';
+import mongoose from 'mongoose';
+import workspaceRoutes from './workspace.routes.js';
+import projectRoutes from './project.routes.js';
+import taskRoutes from './task.routes.js';
+import noteRoutes from './note.routes.js';
+import dashboardRoutes from './dashboard.routes.js';
+import messageRoutes from './message.routes.js';
+import aiRoutes from './ai.routes.js';
+import notificationRoutes from './notification.routes.js';
+const router = Router();
+router.get('/health', (_req, res) => {
+  const connected = mongoose.connection.readyState === 1;
+  if (!connected) return res.status(503).json({ success: false, error: { message: 'Database is unavailable', code: 'DATABASE_UNAVAILABLE' } });
+  res.status(200).json({ success: true, data: { status: 'ok', database: 'connected' } });
+});
+router.use('/auth', authRoutes);
+router.use('/workspaces', workspaceRoutes);
+router.use('/projects', projectRoutes);
+router.use('/tasks', taskRoutes);
+router.use('/notes', noteRoutes);
+router.use('/dashboard', dashboardRoutes);
+router.use('/messages', messageRoutes);
+router.use('/ai', aiRoutes);
+router.use('/notifications', notificationRoutes);
+export default router;
