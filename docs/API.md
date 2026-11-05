@@ -9,13 +9,15 @@ Successful responses use `{ "success": true, "data": ... }`; errors use `{ "succ
 | Method | Path | Access | Purpose |
 | --- | --- | --- | --- |
 | GET | `/health` | Public | API and database readiness |
-| POST | `/auth/register` | Public, rate limited | Create account and session |
+| POST | `/auth/register` | Public, rate limited | Send the registration verification code |
+| POST | `/auth/register/verify` | Public, rate limited | Verify a 4-digit code and create account/session |
+| POST | `/auth/register/resend` | Public, rate limited | Resend registration code |
 | POST | `/auth/login` | Public, rate limited | Start session |
 | POST | `/auth/logout` | Public | Clear session cookie |
 | GET | `/auth/me` | Session | Read profile |
 | PATCH | `/auth/me` | Session | Update name/theme |
 
-Registration body: `{ "name", "email", "password" }`. Login body: `{ "email", "password" }`.
+Registration body: `{ "name", "email", "password" }`. Verify body: `{ "email", "code" }`. Resend body: `{ "email" }`. Codes expire after 10 minutes, allow five verification attempts, and can be resent once per minute up to four times. Login body: `{ "email", "password" }`.
 
 ## Workspaces
 

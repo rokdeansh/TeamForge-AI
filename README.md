@@ -45,6 +45,8 @@ Open the Vite URL, normally `http://localhost:5173`. The client talks to `VITE_A
 | `JWT_SECRET` | Cookie session signing secret | development-only value; set a random 32+ character value in production |
 | `JWT_EXPIRES_IN` | Session lifetime | `7d` |
 | `COOKIE_SAME_SITE` | Session cookie policy (`lax`, `strict`, or `none`) | `lax` |
+| `GMAIL_USER` | Gmail address used to send account verification codes | unset |
+| `GMAIL_APP_PASSWORD` | Gmail App Password used by the server SMTP client | unset |
 | `AI_API_URL` | Full chat-completions endpoint URL | unset |
 | `AI_API_KEY` | Server-side provider key | unset |
 | `AI_MODEL` | Model name understood by the configured endpoint | unset |
@@ -53,12 +55,14 @@ Open the Vite URL, normally `http://localhost:5173`. The client talks to `VITE_A
 
 For separate frontend and backend sites in production, use HTTPS, set `COOKIE_SAME_SITE=none`, and keep the cookie `Secure` setting enabled by production mode. Never put AI keys in `client/.env` or any `VITE_` variable.
 
+Registration requires `GMAIL_USER` and `GMAIL_APP_PASSWORD` in `server/.env`. Create a Google App Password for the sending Gmail account (Google requires 2-Step Verification), and store the 16-character password without spaces. Keep these values server-side and never commit them.
+
 ## Implemented API
 
 All REST endpoints are under `/api/v1`; responses use `{ success, data }` or `{ success: false, error }`.
 
 - `GET /health`
-- Auth: `POST /auth/register`, `POST /auth/login`, `POST /auth/logout`, `GET /auth/me`, `PATCH /auth/me`
+- Auth: registration email-code verification, `POST /auth/login`, `POST /auth/logout`, `GET /auth/me`, `PATCH /auth/me`
 - Workspaces: list/create/update, member list and role changes, member removal, invitation creation and acceptance, ownership transfer, and activity feed
 - Projects: create/list/read/update/delete; list supports workspace, status, search, page, and limit filters
 - Tasks: create/list/update/delete; list supports workspace, project, assignee, status, priority, search, page, and limit filters
@@ -89,6 +93,8 @@ npm run build
 ## Deployment configuration
 
 Deploy `client/` as the Vercel project root and `server/` as the Render/Railway service root. Configure a MongoDB Atlas database and set the backend environment values: `NODE_ENV=production`, `MONGODB_URI`, a random `JWT_SECRET` of at least 32 characters, `CLIENT_ORIGIN` to the exact HTTPS Vercel origin, `COOKIE_SAME_SITE=none`, and `AI_API_URL`/`AI_API_KEY`/`AI_MODEL` if AI is enabled. Production mode sets the session cookie's `Secure` flag. In Vercel, set `VITE_API_URL` to the backend URL plus `/api/v1` and `VITE_SOCKET_URL` to the backend origin. Configure health checks against `/api/v1/health`.
+
+Set `GMAIL_USER` and `GMAIL_APP_PASSWORD` in the backend deployment environment or registration emails will be unavailable.
 
 ## Current limitations
 

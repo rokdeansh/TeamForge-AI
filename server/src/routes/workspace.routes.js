@@ -8,6 +8,10 @@ import { randomBytes, createHash } from 'node:crypto';
 import { Invitation } from '../models/Invitation.js';
 import { Activity } from '../models/Activity.js';
 import { Notification } from '../models/Notification.js';
+import { Project } from '../models/Project.js';
+import { Task } from '../models/Task.js';
+import { Note } from '../models/Note.js';
+import { Message } from '../models/Message.js';
 import { validate } from '../middleware/validate.js';
 import { workspaceCreateSchema, workspaceUpdateSchema, invitationSchema, acceptInvitationSchema } from '../validators/resource.validators.js';
 
@@ -40,6 +44,21 @@ router.patch('/:workspaceId', requireWorkspaceRole('owner', 'admin'), validate(w
   if (!Object.keys(changes).length) throw new AppError('No valid workspace changes provided', 400, 'VALIDATION_ERROR');
   const workspace = await Workspace.findByIdAndUpdate(req.workspaceId, { $set: changes }, { returnDocument: 'after', runValidators: true }).lean();
   res.json({ success: true, data: { workspace } });
+});
+router.delete('/:workspaceId', requireWorkspaceRole('owner'), async (req, res) => {
+  const workspaceId = req.workspaceId;
+  await Promise.all([
+    Task.deleteMany({ workspace: workspaceId }),
+    Project.deleteMany({ workspace: workspaceId }),
+    Note.deleteMany({ workspace: workspaceId }),
+    Message.deleteMany({ workspace: workspaceId }),
+    WorkspaceMembership.deleteMany({ workspace: workspaceId }),
+    Invitation.deleteMany({ workspace: workspaceId }),
+    Activity.deleteMany({ workspace: workspaceId }),
+    Notification.deleteMany({ workspace: workspaceId })
+  ]);
+  await Workspace.deleteOne({ _id: workspaceId });
+  res.json({ success: true, data: { deleted: true } });
 });
 router.post('/:workspaceId/invitations', requireWorkspaceRole('owner', 'admin'), validate(invitationSchema), async (req, res) => {
   const role = req.body.role === 'admin' && req.membership.role === 'owner' ? 'admin' : 'member';

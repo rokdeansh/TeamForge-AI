@@ -25,6 +25,8 @@ export const env = {
   JWT_SECRET: jwtSecret,
   JWT_EXPIRES_IN: process.env.JWT_EXPIRES_IN || '7d',
   COOKIE_SAME_SITE: cookieSameSite,
+  GMAIL_USER: process.env.GMAIL_USER || '',
+  GMAIL_APP_PASSWORD: process.env.GMAIL_APP_PASSWORD || '',
   AI_API_URL: process.env.AI_API_URL || '',
   AI_API_KEY: process.env.AI_API_KEY || '',
   AI_MODEL: process.env.AI_MODEL || ''

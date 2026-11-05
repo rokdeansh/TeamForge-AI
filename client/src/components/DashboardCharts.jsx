@@ -2,7 +2,7 @@ import { CartesianGrid, Cell, Line, LineChart, Pie, PieChart, ResponsiveContaine
 
 export default function DashboardCharts({ data }) {
   const statuses = ['To Do', 'In Progress', 'In Review', 'Completed'];
-  const colors = ['#94a3b8', '#3b82f6', '#8b5cf6', '#10b981'];
+  const colors = ['var(--chart-5)', 'var(--chart-info)', 'var(--chart-2)', 'var(--chart-success)'];
   const counts = Object.fromEntries((data.taskStatus || []).map(status => [status._id, status.count]));
   const pie = statuses.map((name, index) => ({ name, value: counts[name] || 0, color: colors[index] }));
   const line = (data.completedByDay || []).map(day => ({ date: day._id, count: day.count }));
@@ -13,7 +13,7 @@ export default function DashboardCharts({ data }) {
     </section>
     <section className="panel">
       <div className="panel-heading"><div><h2>Completed over time</h2><p>Last 30 days</p></div></div>
-      <ResponsiveContainer width="100%" height={170}><LineChart data={line} margin={{ top: 8, right: 8, left: -22, bottom: 0 }}><CartesianGrid stroke="#eef0f4" vertical={false}/><XAxis dataKey="date" tick={{ fontSize: 9, fill: '#94a3b8' }} tickFormatter={value => value.slice(5)}/><YAxis allowDecimals={false} tick={{ fontSize: 9, fill: '#94a3b8' }}/><Tooltip/><Line type="monotone" dataKey="count" stroke="#6366f1" strokeWidth={2} dot={{ r: 2 }}/></LineChart></ResponsiveContainer>
+      <ResponsiveContainer width="100%" height={170}><LineChart data={line} margin={{ top: 8, right: 8, left: -22, bottom: 0 }}><CartesianGrid stroke="var(--border)" vertical={false}/><XAxis dataKey="date" tick={{ fontSize: 9, fill: 'var(--muted)' }} tickFormatter={value => value.slice(5)}/><YAxis allowDecimals={false} tick={{ fontSize: 9, fill: 'var(--muted)' }}/><Tooltip/><Line type="monotone" dataKey="count" stroke="var(--chart-1)" strokeWidth={2} dot={{ r: 2 }}/></LineChart></ResponsiveContainer>
     </section>
   </>;
 }

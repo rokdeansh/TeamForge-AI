@@ -17,9 +17,11 @@ export function AuthProvider({ children }) {
     const media = matchMedia('(prefers-color-scheme: dark)'); media.addEventListener('change', apply); return () => media.removeEventListener('change', apply);
   }, [user?.themePreference]);
   async function login(email, password) { const data = await api.post('/auth/login', { email, password }); setUser(data.user); }
-  async function register(name, email, password) { const data = await api.post('/auth/register', { name, email, password }); setUser(data.user); }
+  async function register(name, email, password) { return api.post('/auth/register', { name, email, password }); }
+  async function verifyRegistration(email, code) { const data = await api.post('/auth/register/verify', { email, code }); setUser(data.user); return data.user; }
+  async function resendRegistrationOtp(email) { return api.post('/auth/register/resend', { email }); }
   async function logout() { await api.post('/auth/logout'); setUser(null); }
   async function updateProfile(changes) { const data = await api.patch('/auth/me', changes); setUser(data.user); localStorage.setItem('teamforge-theme', data.user.themePreference); return data.user; }
-  return <AuthContext.Provider value={{ user, loading, login, register, logout, updateProfile }}>{children}</AuthContext.Provider>;
+  return <AuthContext.Provider value={{ user, loading, login, register, verifyRegistration, resendRegistrationOtp, logout, updateProfile }}>{children}</AuthContext.Provider>;
 }
 export const useAuth = () => useContext(AuthContext);
