@@ -45,8 +45,10 @@ Open the Vite URL, normally `http://localhost:5173`. The client talks to `VITE_A
 | `JWT_SECRET` | Cookie session signing secret | development-only value; set a random 32+ character value in production |
 | `JWT_EXPIRES_IN` | Session lifetime | `7d` |
 | `COOKIE_SAME_SITE` | Session cookie policy (`lax`, `strict`, or `none`) | `lax` |
-| `GMAIL_USER` | Gmail address used to send account verification codes | unset |
-| `GMAIL_APP_PASSWORD` | Gmail App Password used by the server SMTP client | unset |
+| `GOOGLE_CLIENT_ID` | Google OAuth client ID for Gmail API email sending | unset |
+| `GOOGLE_CLIENT_SECRET` | Google OAuth client secret | unset |
+| `GOOGLE_REFRESH_TOKEN` | Offline OAuth refresh token with `gmail.send` access | unset |
+| `GOOGLE_SENDER_EMAIL` | Gmail address that authorized the refresh token | unset |
 | `AI_API_URL` | Full chat-completions endpoint URL | unset |
 | `AI_API_KEY` | Server-side provider key | unset |
 | `AI_MODEL` | Model name understood by the configured endpoint | unset |
@@ -55,7 +57,7 @@ Open the Vite URL, normally `http://localhost:5173`. The client talks to `VITE_A
 
 For separate frontend and backend sites in production, use HTTPS, set `COOKIE_SAME_SITE=none`, and keep the cookie `Secure` setting enabled by production mode. Never put AI keys in `client/.env` or any `VITE_` variable.
 
-Registration requires `GMAIL_USER` and `GMAIL_APP_PASSWORD` in `server/.env`. Create a Google App Password for the sending Gmail account (Google requires 2-Step Verification), and store the 16-character password without spaces. Keep these values server-side and never commit them.
+Registration email uses the Gmail API over HTTPS. In Google Cloud Console, create a project, enable the Gmail API, configure the OAuth consent screen, and create a Web application OAuth client. Add `https://developers.google.com/oauthplayground` as an authorized redirect URI. In [OAuth 2.0 Playground](https://developers.google.com/oauthplayground/), enable **Use your own OAuth credentials**, enter that client ID and secret, request only `https://www.googleapis.com/auth/gmail.send`, authorize the same Gmail account you want to send from, and exchange the authorization code for tokens. Set `GOOGLE_CLIENT_ID`, `GOOGLE_CLIENT_SECRET`, `GOOGLE_REFRESH_TOKEN`, and `GOOGLE_SENDER_EMAIL` in `server/.env` locally and in the Render service environment in production. Keep these credentials server-side; never put them in a `VITE_` variable or commit them. Google OAuth apps left in external Testing mode issue refresh tokens that expire after 7 days, so follow Google's publishing and verification requirements for a persistent production setup.
 
 ## Implemented API
 
@@ -94,7 +96,7 @@ npm run build
 
 Deploy `client/` as the Vercel project root and `server/` as the Render/Railway service root. Configure a MongoDB Atlas database and set the backend environment values: `NODE_ENV=production`, `MONGODB_URI`, a random `JWT_SECRET` of at least 32 characters, `CLIENT_ORIGIN` to the exact HTTPS Vercel origin, `COOKIE_SAME_SITE=none`, and `AI_API_URL`/`AI_API_KEY`/`AI_MODEL` if AI is enabled. Production mode sets the session cookie's `Secure` flag. In Vercel, set `VITE_API_URL` to the backend URL plus `/api/v1` and `VITE_SOCKET_URL` to the backend origin. Configure health checks against `/api/v1/health`.
 
-Set `GMAIL_USER` and `GMAIL_APP_PASSWORD` in the backend deployment environment or registration emails will be unavailable.
+Set `GOOGLE_CLIENT_ID`, `GOOGLE_CLIENT_SECRET`, `GOOGLE_REFRESH_TOKEN`, and `GOOGLE_SENDER_EMAIL` in the backend deployment environment or registration emails will be unavailable. The sender email must be the same Gmail account used to authorize the refresh token.
 
 ## Current limitations
 

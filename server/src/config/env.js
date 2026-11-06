@@ -25,8 +25,10 @@ export const env = {
   JWT_SECRET: jwtSecret,
   JWT_EXPIRES_IN: process.env.JWT_EXPIRES_IN || '7d',
   COOKIE_SAME_SITE: cookieSameSite,
-  GMAIL_USER: process.env.GMAIL_USER || '',
-  GMAIL_APP_PASSWORD: process.env.GMAIL_APP_PASSWORD || '',
+  GOOGLE_CLIENT_ID: process.env.GOOGLE_CLIENT_ID || '',
+  GOOGLE_CLIENT_SECRET: process.env.GOOGLE_CLIENT_SECRET || '',
+  GOOGLE_REFRESH_TOKEN: process.env.GOOGLE_REFRESH_TOKEN || '',
+  GOOGLE_SENDER_EMAIL: process.env.GOOGLE_SENDER_EMAIL || '',
   AI_API_URL: process.env.AI_API_URL || '',
   AI_API_KEY: process.env.AI_API_KEY || '',
   AI_MODEL: process.env.AI_MODEL || ''
